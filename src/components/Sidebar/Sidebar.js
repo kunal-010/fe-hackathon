@@ -16,8 +16,8 @@
 
 */
 /*eslint-disable*/
-import { useState } from "react";
-import { NavLink as NavLinkRRD, Link } from "react-router-dom";
+import { useContext, useState } from "react";
+import { NavLink as NavLinkRRD, Link, useNavigate } from "react-router-dom";
 // nodejs library to set properties for components
 import { PropTypes } from "prop-types";
 
@@ -33,12 +33,6 @@ import {
   DropdownItem,
   UncontrolledDropdown,
   DropdownToggle,
-  FormGroup,
-  Form,
-  Input,
-  InputGroupAddon,
-  InputGroupText,
-  InputGroup,
   Media,
   NavbarBrand,
   Navbar,
@@ -52,9 +46,22 @@ import {
   Col,
 } from "reactstrap";
 
+
+import { Modal, ModalHeader, ModalBody, ModalFooter, Input,
+  InputGroupAddon,
+  InputGroupText,
+  InputGroup,
+  Form,
+  FormGroup,
+  FormGroupProps } from 'reactstrap';
+import { EmailsContext } from "Context/EmailsContext";
+import Icons from "views/examples/Icons";
+
 var ps;
 
 const Sidebar = (props) => {
+  const navigate = useNavigate();
+  const {emails, setEmails} = useContext(EmailsContext); 
   const [collapseOpen, setCollapseOpen] = useState();
   // verifies if routeName is the one active (in browser input)
   const activeRoute = (routeName) => {
@@ -68,8 +75,11 @@ const Sidebar = (props) => {
   const closeCollapse = () => {
     setCollapseOpen(false);
   };
+  const [modal, setModal] = useState(false);
+  const toggle = () => setModal(!modal);
   // creates the links that appear in the left menu / Sidebar
   const createLinks = (routes) => {
+    if(!routes)return;
     return routes.map((prop, key) => {
       return (
         <NavItem key={key}>
@@ -85,6 +95,26 @@ const Sidebar = (props) => {
       );
     });
   };
+
+  const [emailName, setEmailName]= useState("");
+
+  const onChange = (e) => {
+    setEmailName(e.target.value);
+  }
+  const onAdd = () => {
+    let newEmails = emails;
+    let routeName = emailName;
+    newEmails.push({
+      path: "/" + routeName ,
+      name: routeName,
+      icon: "ni ni-planet text-blue",
+      component: <Icons />,
+      layout: "/email",
+    });
+    setEmails(emails);
+    setModal(!modal);
+    navigate("/email/" + routeName)
+  }
 
   const { bgColor, routes, logo } = props;
   let navbarBrandProps;
@@ -174,9 +204,9 @@ const Sidebar = (props) => {
                 <span>Support</span>
               </DropdownItem>
               <DropdownItem divider />
-              <DropdownItem href="#pablo" onClick={(e) => e.preventDefault()}>
+              <DropdownItem href="#pablo" onClick={(e) => navigate("/auth/login")}>
                 <i className="ni ni-user-run" />
-                <span>Logout</span>
+                <span >Logout</span>
               </DropdownItem>
             </DropdownMenu>
           </UncontrolledDropdown>
@@ -229,12 +259,63 @@ const Sidebar = (props) => {
           </Form>
           {/* Navigation */}
           <Nav navbar>{createLinks(routes)}</Nav>
+          {emails.length !== 0 && 
+          <Button style={{margin: "auto"}} onClick={() => toggle()}>Add Email</Button>}
+          <Modal isOpen={modal} toggle={toggle}>
+          <ModalHeader toggle={toggle}>Configure Email</ModalHeader>
+          <ModalBody>
+              <Form role="form">
+                <FormGroup className="mb-3">
+                  <InputGroup className="input-group-alternative">
+                    <InputGroupAddon addonType="prepend">
+                      <InputGroupText>
+                        <i className="ni ni-email-83" />
+                      </InputGroupText>
+                    </InputGroupAddon>
+                    <Input
+                      placeholder="Email"
+                      type="email"
+                      autoComplete="new-email"
+                      onChange = {(e)=> onChange(e)}
+                    />
+                  </InputGroup>
+                </FormGroup>
+                <FormGroup>
+                  <InputGroup className="input-group-alternative">
+                    <InputGroupAddon addonType="prepend">
+                      <InputGroupText>
+                        <i className="ni ni-lock-circle-open" />
+                      </InputGroupText>
+                    </InputGroupAddon>
+                    <Input
+                      placeholder="Password"
+                      type="password"
+                      autoComplete="new-password"
+                    />
+                  </InputGroup>
+                </FormGroup>
+                <div className="text-center">
+                  <Button className="my-4" color="primary" type="button" onClick={() => onAdd()}>
+                    Add
+                  </Button>
+                </div>
+              </Form>
+          </ModalBody>
+          {/* <ModalFooter>
+            <Button color="primary" onClick={toggle}>
+              Do Something
+            </Button>{' '}
+            <Button color="secondary" onClick={toggle}>
+              Cancel
+            </Button>
+          </ModalFooter> */}
+        </Modal>
           {/* Divider */}
           <hr className="my-3" />
           {/* Heading */}
-          <h6 className="navbar-heading text-muted">Documentation</h6>
+          {/* <h6 className="navbar-heading text-muted">Documentation</h6>
           {/* Navigation */}
-          <Nav className="mb-md-3" navbar>
+          {/* <Nav className="mb-md-3" navbar>
             <NavItem>
               <NavLink href="https://demos.creative-tim.com/argon-dashboard-react/#/documentation/overview?ref=adr-admin-sidebar">
                 <i className="ni ni-spaceship" />
@@ -252,16 +333,16 @@ const Sidebar = (props) => {
                 <i className="ni ni-ui-04" />
                 Components
               </NavLink>
-            </NavItem>
-          </Nav>
-          <Nav className="mb-md-3" navbar>
+            </NavItem> */}
+          {/* </Nav> */}
+          {/* <Nav className="mb-md-3" navbar>
             <NavItem className="active-pro active">
               <NavLink href="https://www.creative-tim.com/product/argon-dashboard-pro-react?ref=adr-admin-sidebar">
                 <i className="ni ni-spaceship" />
                 Upgrade to PRO
               </NavLink>
             </NavItem>
-          </Nav>
+          </Nav> */}
         </Collapse>
       </Container>
     </Navbar>

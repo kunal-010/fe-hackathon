@@ -1,0 +1,26 @@
+import { EmailsContext } from 'Context/EmailsContext'
+import React, { useState } from 'react'
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+import AdminLayout from "layouts/Admin.js";
+import AuthLayout from "layouts/Auth.js";
+
+
+
+function App() {
+
+    const [emails, setEmails] = useState([]);
+
+    return (
+    <EmailsContext.Provider value={{emails,setEmails}}>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/*" element={<AdminLayout />} />
+        <Route path="/auth/*" element={<AuthLayout />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </BrowserRouter>
+  </EmailsContext.Provider>
+  )
+}
+
+export default App
