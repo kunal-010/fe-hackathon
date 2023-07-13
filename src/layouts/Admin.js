@@ -15,7 +15,7 @@
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 */
-import React from "react";
+import React, { useContext, useState } from "react";
 import { useLocation, Route, Routes, Navigate } from "react-router-dom";
 // reactstrap components
 import { Container } from "reactstrap";
@@ -24,7 +24,10 @@ import AdminNavbar from "components/Navbars/AdminNavbar.js";
 import AdminFooter from "components/Footers/AdminFooter.js";
 import Sidebar from "components/Sidebar/Sidebar.js";
 
-import routes from "routes.js";
+import routes from './../routes';
+import Index from "views/Index";
+import Icons from "views/examples/Icons";
+import { EmailsContext } from "Context/EmailsContext";
 
 const Admin = (props) => {
   const mainContent = React.useRef(null);
@@ -35,6 +38,25 @@ const Admin = (props) => {
     document.scrollingElement.scrollTop = 0;
     mainContent.current.scrollTop = 0;
   }, [location]);
+
+  const {emails} = useContext(EmailsContext);
+
+  // const [routes,setRoutes] = useState([
+  //   {
+  //     path: "",
+  //     name: "Dashboard",
+  //     icon: "ni ni-tv-2 text-primary",
+  //     component: <Index />,
+  //     layout: "/",
+  //   },
+  //   {
+  //     path: "/id",
+  //     name: "Icons",
+  //     icon: "ni ni-planet text-blue",
+  //     component: <Icons />,
+  //     layout: "/email",
+  //   },
+  // ]);
 
   const getRoutes = (routes) => {
     return routes.map((prop, key) => {
@@ -64,7 +86,7 @@ const Admin = (props) => {
     <>
       <Sidebar
         {...props}
-        routes={routes}
+        routes={emails}
         logo={{
           innerLink: "/admin/index",
           imgSrc: require("../assets/img/brand/argon-react.png"),
@@ -78,7 +100,7 @@ const Admin = (props) => {
         />
         <Routes>
           {getRoutes(routes)}
-          <Route path="*" element={<Navigate to="/admin/index" replace />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
         <Container fluid>
           <AdminFooter />

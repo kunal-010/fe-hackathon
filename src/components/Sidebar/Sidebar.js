@@ -16,8 +16,8 @@
 
 */
 /*eslint-disable*/
-import { useState } from "react";
-import { NavLink as NavLinkRRD, Link } from "react-router-dom";
+import { useContext, useState } from "react";
+import { NavLink as NavLinkRRD, Link, useNavigate } from "react-router-dom";
 // nodejs library to set properties for components
 import { PropTypes } from "prop-types";
 
@@ -51,10 +51,14 @@ import {
   Row,
   Col,
 } from "reactstrap";
+import { EmailsContext } from "Context/EmailsContext";
+import Icons from "views/examples/Icons";
 
 var ps;
 
 const Sidebar = (props) => {
+  const navigate = useNavigate();
+  const {emails, setEmails} = useContext(EmailsContext); 
   const [collapseOpen, setCollapseOpen] = useState();
   // verifies if routeName is the one active (in browser input)
   const activeRoute = (routeName) => {
@@ -70,6 +74,7 @@ const Sidebar = (props) => {
   };
   // creates the links that appear in the left menu / Sidebar
   const createLinks = (routes) => {
+    if(!routes)return;
     return routes.map((prop, key) => {
       return (
         <NavItem key={key}>
@@ -85,6 +90,20 @@ const Sidebar = (props) => {
       );
     });
   };
+
+  const onAdd = () => {
+    let newEmails = emails;
+    let routeName = "test@gmail.com" + Math.floor(Math.random() * (1000 - 100) + 100) / 100;
+    newEmails.push({
+      path: "/" + routeName ,
+      name: routeName,
+      icon: "ni ni-planet text-blue",
+      component: <Icons />,
+      layout: "/email",
+    });
+    setEmails(emails);
+    navigate("/email/" + routeName)
+  }
 
   const { bgColor, routes, logo } = props;
   let navbarBrandProps;
@@ -174,9 +193,9 @@ const Sidebar = (props) => {
                 <span>Support</span>
               </DropdownItem>
               <DropdownItem divider />
-              <DropdownItem href="#pablo" onClick={(e) => e.preventDefault()}>
+              <DropdownItem href="#pablo" onClick={(e) => navigate("/auth/login")}>
                 <i className="ni ni-user-run" />
-                <span>Logout</span>
+                <span >Logout</span>
               </DropdownItem>
             </DropdownMenu>
           </UncontrolledDropdown>
@@ -229,12 +248,13 @@ const Sidebar = (props) => {
           </Form>
           {/* Navigation */}
           <Nav navbar>{createLinks(routes)}</Nav>
+          {emails.length !== 0 && <Button style={{margin: "auto"}} onClick={() => onAdd()}>Add Email</Button>}
           {/* Divider */}
           <hr className="my-3" />
           {/* Heading */}
-          <h6 className="navbar-heading text-muted">Documentation</h6>
+          {/* <h6 className="navbar-heading text-muted">Documentation</h6>
           {/* Navigation */}
-          <Nav className="mb-md-3" navbar>
+          {/* <Nav className="mb-md-3" navbar>
             <NavItem>
               <NavLink href="https://demos.creative-tim.com/argon-dashboard-react/#/documentation/overview?ref=adr-admin-sidebar">
                 <i className="ni ni-spaceship" />
@@ -252,16 +272,16 @@ const Sidebar = (props) => {
                 <i className="ni ni-ui-04" />
                 Components
               </NavLink>
-            </NavItem>
-          </Nav>
-          <Nav className="mb-md-3" navbar>
+            </NavItem> */}
+          {/* </Nav> */}
+          {/* <Nav className="mb-md-3" navbar>
             <NavItem className="active-pro active">
               <NavLink href="https://www.creative-tim.com/product/argon-dashboard-pro-react?ref=adr-admin-sidebar">
                 <i className="ni ni-spaceship" />
                 Upgrade to PRO
               </NavLink>
             </NavItem>
-          </Nav>
+          </Nav> */}
         </Collapse>
       </Container>
     </Navbar>

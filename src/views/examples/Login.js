@@ -17,6 +17,7 @@
 */
 
 // reactstrap components
+import { useNavigate } from "react-router-dom";
 import {
   Button,
   Card,
@@ -33,6 +34,8 @@ import {
 } from "reactstrap";
 
 const Login = () => {
+  const navigate = useNavigate();
+
   return (
     <>
       <Col lg="5" md="7">
@@ -125,7 +128,7 @@ const Login = () => {
                 </label>
               </div>
               <div className="text-center">
-                <Button className="my-4" color="primary" type="button">
+                <Button className="my-4" color="primary" type="button" onClick={() => navigate("/")}>
                   Sign in
                 </Button>
               </div>
