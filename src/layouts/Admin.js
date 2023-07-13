@@ -72,17 +72,19 @@ const Admin = (props) => {
         }}
       />
       <div className="main-content" ref={mainContent}>
-        <AdminNavbar
+        {/* <AdminNavbar
           {...props}
           brandText={getBrandText(props?.location?.pathname)}
-        />
+        /> */}
+        <p>Mahi</p>
         <Routes>
           {getRoutes(routes)}
           <Route path="*" element={<Navigate to="/admin/index" replace />} />
         </Routes>
-        <Container fluid>
+        
+        {/* <Container fluid>
           <AdminFooter />
-        </Container>
+        </Container> */}
       </div>
     </>
   );
