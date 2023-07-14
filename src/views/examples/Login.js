@@ -33,9 +33,31 @@ import {
   Col,
 } from "reactstrap";
 import { Link } from "react-router-dom";
+import { useState } from "react";
 
 const Login = () => {
   const navigate = useNavigate();
+  const [validEmail,setValidEmail] = useState(true);
+  const [validPassword,setValidPassord] = useState(true);
+
+  const onEmailChange = (e) => {
+    let regex = /^[a-z0-9]+@[a-z]+\.[a-z]{2,3}$/;
+    let result = regex.test(e.target.value);
+    if(!result){
+      setValidEmail(false)
+    }else{
+      setValidEmail(true)
+    }
+  } 
+
+  const onPasswordChange = (e) => {
+    
+    if(e.target.value?.length < 6){
+      setValidPassord(false)
+    }else{
+      setValidPassord(true)
+    }
+  } 
 
   return (
     <>
@@ -85,7 +107,7 @@ const Login = () => {
           <CardBody className="px-lg-5 py-lg-5">
             
             <Form role="form">
-              <FormGroup className="mb-3">
+              <FormGroup className="mb-2">
                 <InputGroup className="input-group-alternative">
                   <InputGroupAddon addonType="prepend">
                     <InputGroupText>
@@ -96,9 +118,11 @@ const Login = () => {
                     placeholder="Email"
                     type="email"
                     autoComplete="new-email"
+                    onChange={(e) => onEmailChange(e)}
                   />
                 </InputGroup>
               </FormGroup>
+              {!validEmail && <div style={{color: "red"}}>Enter valid email</div>}
               <FormGroup>
                 <InputGroup className="input-group-alternative">
                   <InputGroupAddon addonType="prepend">
@@ -110,9 +134,11 @@ const Login = () => {
                     placeholder="Password"
                     type="password"
                     autoComplete="new-password"
+                    onChange={(e) => onPasswordChange(e)}
                   />
                 </InputGroup>
               </FormGroup>
+              {!validPassword && <div style={{color: "red"}}>Password length should be at least 6</div>}
               <div className="custom-control custom-control-alternative custom-checkbox">
                 <input
                   className="custom-control-input"

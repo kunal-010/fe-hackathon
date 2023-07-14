@@ -67,10 +67,28 @@ const Index = (props) => {
   }
   const [modal, setModal] = useState(false);
   const [emailName, setEmailName]= useState("");
+  const [validEmail,setValidEmail] = useState(true);
+  const [validPassword,setValidPassord] = useState(true);
 
   const onChange = (e) => {
     setEmailName(e.target.value);
+    let regex = /^[a-z0-9]+@[a-z]+\.[a-z]{2,3}$/;
+    let result = regex.test(e.target.value);
+    if(!result){
+      setValidEmail(false)
+    }else{
+      setValidEmail(true)
+    }
   }
+
+  const onPasswordChange = (e) => {
+    
+    if(e.target.value?.length < 6){
+      setValidPassord(false)
+    }else{
+      setValidPassord(true)
+    }
+  } 
   const toggle = () => setModal(!modal);
   const onAdd = () => {
     let newEmails = emails;
@@ -81,6 +99,7 @@ const Index = (props) => {
       icon: "ni ni-planet text-blue",
       component: <Icons />,
       layout: "/email",
+      pause: false
     });
     setEmails(emails);
     navigate("/email/" + routeName)
@@ -90,8 +109,8 @@ const Index = (props) => {
     <>
       <Header />
       {/* Page content */}
-      <Container className="mt--7 bg-gradient-info" fluid>
-        <Button style={{margin: "auto"}} onClick={() => toggle()}>Add Email</Button>
+      <Container className="mt--7 bg-gradient-info" fluid style={{display: "flex", justifyItems: "center"}}>
+        <Button style={{margin: "auto"}} onClick={() => toggle()}>Add MailBox</Button>
         <Modal isOpen={modal} toggle={toggle}>
         <ModalHeader toggle={toggle}>Configure Email</ModalHeader>
         <ModalBody>
@@ -111,6 +130,7 @@ const Index = (props) => {
                   />
                 </InputGroup>
               </FormGroup>
+              {!validEmail && <div style={{color: "red"}}>Enter valid email</div>}
               <FormGroup>
                 <InputGroup className="input-group-alternative">
                   <InputGroupAddon addonType="prepend">
@@ -122,9 +142,11 @@ const Index = (props) => {
                     placeholder="Password"
                     type="password"
                     autoComplete="new-password"
+                    onChange={(e) => onPasswordChange(e)}
                   />
                 </InputGroup>
               </FormGroup>
+              {!validPassword && <div style={{color: "red"}}>Password length should be at least 6</div>}
               <div className="text-center">
                 <Button className="my-4" color="primary" type="button" onClick={() => onAdd()}>
                   Add

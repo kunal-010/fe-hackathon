@@ -17,7 +17,7 @@
 */
 /*eslint-disable*/
 import { useContext, useState } from "react";
-import { NavLink as NavLinkRRD, Link, useNavigate } from "react-router-dom";
+import { NavLink as NavLinkRRD, Link, useNavigate, useParams } from "react-router-dom";
 // nodejs library to set properties for components
 import { PropTypes } from "prop-types";
 
@@ -56,13 +56,37 @@ import { Modal, ModalHeader, ModalBody, ModalFooter, Input,
   FormGroupProps } from 'reactstrap';
 import { EmailsContext } from "Context/EmailsContext";
 import Icons from "views/examples/Icons";
-
+import PauseIcon from '@mui/icons-material/Pause';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import MailIcon from '@mui/icons-material/Mail';
 var ps;
 
 const Sidebar = (props) => {
+  const params= useParams();
   const navigate = useNavigate();
   const {emails, setEmails} = useContext(EmailsContext); 
   const [collapseOpen, setCollapseOpen] = useState();
+  const [validEmail,setValidEmail] = useState(true);
+  const [validPassword,setValidPassord] = useState(true);
+
+  const onEmailChange = (e) => {
+    let regex = /^[a-z0-9]+@[a-z]+\.[a-z]{2,3}$/;
+    let result = regex.test(e.target.value);
+    if(!result){
+      setValidEmail(false)
+    }else{
+      setValidEmail(true)
+    }
+  } 
+
+  const onPasswordChange = (e) => {
+    
+    if(e.target.value?.length < 6){
+      setValidPassord(false)
+    }else{
+      setValidPassord(true)
+    }
+  } 
   // verifies if routeName is the one active (in browser input)
   const activeRoute = (routeName) => {
     return props.location.pathname.indexOf(routeName) > -1 ? "active" : "";
@@ -77,20 +101,35 @@ const Sidebar = (props) => {
   };
   const [modal, setModal] = useState(false);
   const toggle = () => setModal(!modal);
+
+  const togglePause = (e,key) => {
+    let newEmails = emails;
+    newEmails[key].pause = !newEmails[key].pause;
+    setEmails(newEmails);
+    navigate("/email/"+ params["*"].split("/")[1]);
+  }
+
   // creates the links that appear in the left menu / Sidebar
   const createLinks = (routes) => {
     if(!routes)return;
     return routes.map((prop, key) => {
       return (
-        <NavItem key={key}>
+        <NavItem key={key} style={{display:"flex", flexDirection: "row", alignItems: "center",justifyContent: "space-between", marginRight: "10px"}}>
           <NavLink
             to={prop.layout + prop.path}
             tag={NavLinkRRD}
             onClick={closeCollapse}
           >
-            <i className={prop.icon} />
+            <i className="ni ni-email-83 text-blue" />
             {prop.name}
+            
           </NavLink>
+          {!prop.pause && <a style={{backgroundColor: "white", border: "0px"}} onClick={(e) => togglePause(e,key)}>
+            <PauseIcon style={{justifySelf: "flex-end", cursor: "pointer"}} />
+          </a>}
+          {prop.pause && <a style={{backgroundColor: "white", border: "0px"}} onClick={(e) => togglePause(e,key)}>
+            <PlayArrowIcon style={{justifySelf: "flex-end", cursor: "pointer"}} />
+          </a>}
         </NavItem>
       );
     });
@@ -100,6 +139,13 @@ const Sidebar = (props) => {
 
   const onChange = (e) => {
     setEmailName(e.target.value);
+    let regex = /^[a-z0-9]+@[a-z]+\.[a-z]{2,3}$/;
+    let result = regex.test(e.target.value);
+    if(!result){
+      setValidEmail(false)
+    }else{
+      setValidEmail(true)
+    }
   }
   const onAdd = () => {
     let newEmails = emails;
@@ -254,15 +300,15 @@ const Sidebar = (props) => {
                 <InputGroupText>
                   <span className="fa fa-search" />
                 </InputGroupText>
-              </InputGroupAddon>
+              </InputGroupAddon>  
             </InputGroup>
           </Form>
           {/* Navigation */}
           <Nav navbar>{createLinks(routes)}</Nav>
           {emails.length !== 0 && 
-          <Button style={{margin: "auto"}} onClick={() => toggle()}>Add Email</Button>}
+          <Button style={{marginTop: "15px", position: "absolute", bottom: "30px", right: "2px"}} onClick={() => toggle()} >Add MailBox</Button>}
           <Modal isOpen={modal} toggle={toggle}>
-          <ModalHeader toggle={toggle}>Configure Email</ModalHeader>
+          <ModalHeader toggle={toggle}>Configure MailBox</ModalHeader>
           <ModalBody>
               <Form role="form">
                 <FormGroup className="mb-3">
@@ -280,6 +326,7 @@ const Sidebar = (props) => {
                     />
                   </InputGroup>
                 </FormGroup>
+                {!validEmail && <div style={{color: "red"}}>Enter valid email</div>}
                 <FormGroup>
                   <InputGroup className="input-group-alternative">
                     <InputGroupAddon addonType="prepend">
@@ -291,9 +338,11 @@ const Sidebar = (props) => {
                       placeholder="Password"
                       type="password"
                       autoComplete="new-password"
+                      onChange={(e) => onPasswordChange(e)}
                     />
                   </InputGroup>
                 </FormGroup>
+                {!validPassword && <div style={{color: "red"}}>Password length should be at least 6</div>}
                 <div className="text-center">
                   <Button className="my-4" color="primary" type="button" onClick={() => onAdd()}>
                     Add
@@ -311,7 +360,7 @@ const Sidebar = (props) => {
           </ModalFooter> */}
         </Modal>
           {/* Divider */}
-          <hr className="my-3" />
+          {/* <hr className="my-3" /> */}
           {/* Heading */}
           {/* <h6 className="navbar-heading text-muted">Documentation</h6>
           {/* Navigation */}
